@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -29,8 +30,8 @@ public abstract class MixinServerLevel extends Level {
         int original = super.getSignal(pos, direction);
         BlockPos target = pos.relative(direction.getOpposite());
         
-        Ship s = VSGameUtilsKt.getShipManagingPos((ServerLevel)(Object) this, target);
-        if (s instanceof ServerShip serverShip) {
+        Ship s = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel)(Object) this, target);
+        if (s instanceof LoadedServerShip serverShip) {
             original = Math.max(
                     original,
                     ShipWireNetworkManager.get(serverShip)

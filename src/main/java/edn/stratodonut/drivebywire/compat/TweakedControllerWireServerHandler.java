@@ -1,8 +1,8 @@
 package edn.stratodonut.drivebywire.compat;
 
-import com.jozufozu.flywheel.util.WorldAttached;
 import com.mojang.datafixers.util.Pair;
 import edn.stratodonut.drivebywire.wire.ShipWireNetworkManager;
+import net.createmod.catnip.data.WorldAttached;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 

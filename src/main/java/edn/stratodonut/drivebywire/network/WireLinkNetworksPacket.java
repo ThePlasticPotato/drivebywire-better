@@ -1,7 +1,6 @@
 package edn.stratodonut.drivebywire.network;
 
 import com.simibubi.create.foundation.networking.SimplePacketBase;
-import com.simibubi.create.foundation.utility.Components;
 import edn.stratodonut.drivebywire.blocks.WireNetworkBackupBlockEntity;
 import edn.stratodonut.drivebywire.wire.ShipWireNetworkManager;
 import net.minecraft.ChatFormatting;
@@ -9,9 +8,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -51,23 +52,23 @@ public class WireLinkNetworksPacket extends SimplePacketBase {
                 if (!nbt.contains("WireNetwork", Tag.TAG_COMPOUND)) return;
                 if (!nbt.getCompound("WireNetwork").contains("Network", Tag.TAG_COMPOUND)) return;
 
-                Ship s1 = VSGameUtilsKt.getShipManagingPos(sender.level(), BlockPos.of(start));
-                Ship s2 = VSGameUtilsKt.getShipManagingPos(sender.level(), BlockPos.of(end));
-                if (s1 instanceof ServerShip ss1 && s2 instanceof ServerShip ss2) {
+                Ship s1 = VSGameUtilsKt.getShipObjectManagingPos(sender.level(), BlockPos.of(start));
+                Ship s2 = VSGameUtilsKt.getShipObjectManagingPos(sender.level(), BlockPos.of(end));
+                if (s1 instanceof LoadedServerShip ss1 && s2 instanceof LoadedServerShip ss2) {
                     Optional<ShipWireNetworkManager> m1 = ShipWireNetworkManager.get(ss1);
                     Optional<ShipWireNetworkManager> m2 = ShipWireNetworkManager.get(ss2);
 
                     if (m1.isPresent() && m2.isPresent()) {
                         nbt = nbt.getCompound("WireNetwork").getCompound("Network");
                         if (!nbt.contains(m2.get().getName(), Tag.TAG_COMPOUND)) {
-                            sender.displayClientMessage(Components.literal(
+                            sender.displayClientMessage(Component.literal(
                                     String.format("No backup to load for %s to %s!", m1.get().getName(), m2.get().getName()))
                                     .withStyle(Style.EMPTY.withColor(ChatFormatting.RED)), true
                             );
                             return;
                         }
 
-                        sender.displayClientMessage(Components.literal(String.format("Relinking %s to %s", m1.get().getName(), m2.get().getName())), true);
+                        sender.displayClientMessage(Component.literal(String.format("Relinking %s to %s", m1.get().getName(), m2.get().getName())), true);
 
                         m1.get().linkNetwork(m2.get(), ss2.getId(), nbt.getCompound(m2.get().getName()));
                     }

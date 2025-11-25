@@ -3,7 +3,6 @@ package edn.stratodonut.drivebywire.blocks;
 import com.getitemfromblock.create_tweaked_controllers.item.ModItems;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.AllShapes;
-import com.simibubi.create.foundation.utility.VoxelShaper;
 import edn.stratodonut.drivebywire.WireSounds;
 import edn.stratodonut.drivebywire.util.HubItem;
 import edn.stratodonut.drivebywire.wire.MultiChannelWireSource;

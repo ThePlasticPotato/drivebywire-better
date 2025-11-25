@@ -4,6 +4,10 @@ import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import com.simibubi.create.foundation.item.TooltipHelper;
+import edn.stratodonut.drivebywire.wire.ShipWireNetworkManager;
+import net.createmod.catnip.lang.FontHelper;
+import net.createmod.ponder.api.registration.PonderPlugin;
+import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -13,6 +17,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+import org.valkyrienskies.mod.api.ValkyrienSkies;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("drivebywire")
@@ -26,7 +33,7 @@ public class DriveByWireMod
 
     static {
         REGISTRATE.setTooltipModifierFactory(item ->
-                new ItemDescription.Modifier(item, TooltipHelper.Palette.STANDARD_CREATE));
+                new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE));
     }
 
     public DriveByWireMod() { onCtor(); }
@@ -39,6 +46,15 @@ public class DriveByWireMod
         REGISTRATE.registerEventListeners(modEventBus);
         modEventBus.addListener(this::onCommonSetup);
 
+        ValkyrienSkies.api().registerAttachment(ValkyrienSkies.api().newAttachmentRegistrationBuilder(ShipWireNetworkManager.class)
+                .useLegacySerializer()
+                .build()
+        );
+
+        ValkyrienSkies.api().getShipLoadEvent().on (ship -> {
+            ShipWireNetworkManager.getOrCreate(ship.getShip());
+        });
+
         // TODO: CHANGE LOGO
         // TODO: Test with audience(?)
         WireCreativeTabs.register(modEventBus);
@@ -48,7 +64,11 @@ public class DriveByWireMod
         WirePackets.registerPackets();
 
         WireSounds.register(modEventBus);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> WirePonders::register);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::onCtorClient);
+    }
+
+    private void onCtorClient() {
+        PonderIndex.addPlugin(new WirePonderPlugin());
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {

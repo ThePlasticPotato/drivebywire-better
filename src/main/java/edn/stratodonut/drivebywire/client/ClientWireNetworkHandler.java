@@ -2,9 +2,6 @@ package edn.stratodonut.drivebywire.client;
 
 import com.simibubi.create.CreateClient;
 import com.simibubi.create.content.kinetics.mechanicalArm.ArmInteractionPoint;
-import com.simibubi.create.foundation.utility.Color;
-import com.simibubi.create.foundation.utility.Components;
-import com.simibubi.create.foundation.utility.Pair;
 import edn.stratodonut.drivebywire.WireItems;
 import edn.stratodonut.drivebywire.WirePackets;
 import edn.stratodonut.drivebywire.blocks.WireNetworkBackupBlock;
@@ -18,11 +15,15 @@ import edn.stratodonut.drivebywire.util.ImmutableHashMap;
 import edn.stratodonut.drivebywire.wire.MultiChannelWireSource;
 import edn.stratodonut.drivebywire.wire.ShipWireNetworkManager;
 import edn.stratodonut.drivebywire.wire.graph.WireNetworkNode.WireNetworkSink;
+import net.createmod.catnip.data.Pair;
+import net.createmod.catnip.outliner.Outliner;
+import net.createmod.catnip.theme.Color;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -101,7 +102,7 @@ public class ClientWireNetworkHandler {
                 currentNetwork = new ImmutableHashMap<>(clientManagers.get(shipId).getNetwork());
 
                 if (world.getBlockState(selectedSource).getBlock() instanceof WireNetworkBackupBlock) {
-                    player.displayClientMessage(Components.literal(String.format("Relinking from %s", clientManagers.get(shipId).getName())), true);
+                    player.displayClientMessage(Component.literal(String.format("Relinking from %s", clientManagers.get(shipId).getName())), true);
                 }
             } else {
                 syncManager(shipId);
@@ -197,7 +198,7 @@ public class ClientWireNetworkHandler {
             currentChannel = ShipWireNetworkManager.WORLD_REDSTONE_CHANNEL;
         }
         Player p = Minecraft.getInstance().player;
-        if (p != null) p.displayClientMessage(Components.literal("Selected Channel: " + currentChannel), true);
+        if (p != null) p.displayClientMessage(Component.literal("Selected Channel: " + currentChannel), true);
     }
 
     public static void clearSource() {
@@ -303,7 +304,7 @@ public class ClientWireNetworkHandler {
     private static void drawConnection(Level level, BlockPos start, BlockPos end, Direction dir, int faceColor, int wireColor) {
         drawOutlineFace(level, end, dir, faceColor);
 
-        CreateClient.OUTLINER.showLine(
+        Outliner.getInstance().showLine(
                 Pair.of("wireConnection", Pair.of(end, dir)),
                 VSGameUtilsKt.toWorldCoordinates(level, Vec3.atCenterOf(start)),
                 VSGameUtilsKt.toWorldCoordinates(level, Vec3.atCenterOf(end).add(new Vec3(dir.step().mul(0.5f))))
@@ -311,7 +312,7 @@ public class ClientWireNetworkHandler {
     }
 
     private static void drawOutlineFace(Level level, BlockPos pos, Direction dir, int color) {
-        CreateClient.OUTLINER.showAABB(Pair.of("wireFace", BlockFace.of(pos, dir)), FaceOutlines.getOutline(dir).move(pos))
+        Outliner.getInstance().showAABB(Pair.of("wireFace", BlockFace.of(pos, dir)), FaceOutlines.getOutline(dir).move(pos))
                 .colored(color)
                 .lineWidth(1 / 16f);
     }
@@ -321,7 +322,7 @@ public class ClientWireNetworkHandler {
         BlockState state = level.getBlockState(pos);
         AABB box = state.getShape(level, pos).isEmpty() ? UNIT_CUBE : state.getShape(level, pos).bounds();
 
-        CreateClient.OUTLINER.showAABB(Pair.of("wireBlock",pos), box.move(pos))
+        Outliner.getInstance().showAABB(Pair.of("wireBlock",pos), box.move(pos))
                 .colored(color)
                 .lineWidth(1 / 16f);
     }

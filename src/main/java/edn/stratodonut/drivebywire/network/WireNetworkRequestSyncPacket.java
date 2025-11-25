@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -32,8 +33,8 @@ public class WireNetworkRequestSyncPacket extends SimplePacketBase {
     public boolean handle(NetworkEvent.Context context) {
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
-            Ship s = VSGameUtilsKt.getAllShips(sender.level()).getById(shipId);
-            if (s instanceof ServerShip ss) {
+            Ship s = VSGameUtilsKt.getShipObjectWorld(sender.level()).getLoadedShips().getById(shipId);
+            if (s instanceof LoadedServerShip ss) {
                 ShipWireNetworkManager.get(ss).ifPresent(
                         m -> WirePackets.getChannel().send(PacketDistributor.PLAYER.with(() -> sender),
                                         new WireNetworkFullSyncPacket(shipId, m.serialiseToNbt(sender.level(), BlockPos.ZERO, true)))

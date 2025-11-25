@@ -19,9 +19,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 
 import org.jetbrains.annotations.Contract;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.impl.shadow.B;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import javax.annotation.Nonnull;
@@ -33,7 +33,7 @@ import static org.valkyrienskies.mod.common.util.VectorConversionsMCKt.toMinecra
 @JsonAutoDetect(
         fieldVisibility = JsonAutoDetect.Visibility.ANY
 )
-public class ShipWireNetworkManager {
+public final class ShipWireNetworkManager {
     @JsonIgnore
     public static final String WORLD_REDSTONE_CHANNEL = "world";
 
@@ -66,9 +66,9 @@ public class ShipWireNetworkManager {
     }
 
     @Nonnull
-    public static ShipWireNetworkManager getOrCreate(ServerShip ship) {
+    public static ShipWireNetworkManager getOrCreate(LoadedServerShip ship) {
         if (ship.getAttachment(ShipWireNetworkManager.class) == null) {
-            ship.saveAttachment(ShipWireNetworkManager.class,
+            ship.setAttachment(
                     new ShipWireNetworkManager(
                             ship.getId(),
                             BlockPos.containing(toMinecraft(ship.getTransform().getPositionInShip())).asLong(),
@@ -81,14 +81,14 @@ public class ShipWireNetworkManager {
     }
 
     @Nonnull
-    public static Optional<ShipWireNetworkManager> get(ServerShip ship) {
+    public static Optional<ShipWireNetworkManager> get(LoadedServerShip ship) {
         return Optional.ofNullable(ship.getAttachment(ShipWireNetworkManager.class));
     }
 
-    public static void loadIfNotExists(ServerShip ship, Level level, CompoundTag nbt, BlockPos origin, Rotation rot) {
+    public static void loadIfNotExists(LoadedServerShip ship, Level level, CompoundTag nbt, BlockPos origin, Rotation rot) {
         ShipWireNetworkManager m = ship.getAttachment(ShipWireNetworkManager.class);
         if (m == null) {
-            ship.saveAttachment(ShipWireNetworkManager.class, new ShipWireNetworkManager(ship.getId(), 0L, ""));
+            ship.setAttachment(new ShipWireNetworkManager(ship.getId(), 0L, ""));
             ship.getAttachment(ShipWireNetworkManager.class).deserialiseFromNbt(level, nbt, origin, rot);
         } else {
             if (nbt.contains("Network", Tag.TAG_COMPOUND))
@@ -119,9 +119,9 @@ public class ShipWireNetworkManager {
     }
 
     public static CONNECTION_RESULT createConnection(Level level, BlockPos in, BlockPos out, Direction dir, String channel) {
-        Ship s1 = VSGameUtilsKt.getShipManagingPos(level, in);
-        Ship s2 = VSGameUtilsKt.getShipManagingPos(level, out);
-        if (s1 instanceof ServerShip ss1 && s2 instanceof ServerShip ss2) {
+        Ship s1 = VSGameUtilsKt.getShipObjectManagingPos(level, in);
+        Ship s2 = VSGameUtilsKt.getShipObjectManagingPos(level, out);
+        if (s1 instanceof LoadedServerShip ss1 && s2 instanceof LoadedServerShip ss2) {
             ShipWireNetworkManager m1 = ShipWireNetworkManager.getOrCreate(ss1);
             ShipWireNetworkManager m2 = ShipWireNetworkManager.getOrCreate(ss2);
 
@@ -144,9 +144,9 @@ public class ShipWireNetworkManager {
     }
 
     public static void removeConnection(Level level, BlockPos in, BlockPos out, Direction dir, String channel) {
-        Ship s1 = VSGameUtilsKt.getShipManagingPos(level, in);
-        Ship s2 = VSGameUtilsKt.getShipManagingPos(level, out);
-        if (s1 instanceof ServerShip ss1 && s2 instanceof ServerShip ss2) {
+        Ship s1 = VSGameUtilsKt.getShipObjectManagingPos(level, in);
+        Ship s2 = VSGameUtilsKt.getShipObjectManagingPos(level, out);
+        if (s1 instanceof LoadedServerShip ss1 && s2 instanceof LoadedServerShip ss2) {
             Optional<ShipWireNetworkManager> o1 = ShipWireNetworkManager.get(ss1);
             Optional<ShipWireNetworkManager> o2 = ShipWireNetworkManager.get(ss2);
             if (o1.isEmpty() || o2.isEmpty()) return;
@@ -174,8 +174,8 @@ public class ShipWireNetworkManager {
     }
 
     public static void removeAllFromSource(Level level, BlockPos in) {
-        Ship s1 = VSGameUtilsKt.getShipManagingPos(level, in);
-        if (s1 instanceof ServerShip ss1) {
+        Ship s1 = VSGameUtilsKt.getShipObjectManagingPos(level, in);
+        if (s1 instanceof LoadedServerShip ss1) {
             ShipWireNetworkManager.get(ss1).ifPresent(m -> {
                 m.sinks.getOrDefault(in.asLong(), new HashMap<>())
                         .forEach((channel, subnet) -> subnet.forEach(node -> node.setInput(level, channel, 0)));
@@ -206,8 +206,8 @@ public class ShipWireNetworkManager {
      * No guarantee if it successfully works!
      */
     public static void trySetSignalAt(Level level, BlockPos in, String channel, int value) {
-        Ship s = VSGameUtilsKt.getShipManagingPos(level, in);
-        if (!(s instanceof ServerShip ss)) return;
+        Ship s = VSGameUtilsKt.getShipObjectManagingPos(level, in);
+        if (!(s instanceof LoadedServerShip ss)) return;
         ShipWireNetworkManager.get(ss).ifPresent(m -> m.setSource(level, in, channel, value));
     }
 

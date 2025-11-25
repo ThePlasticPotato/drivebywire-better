@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -31,8 +32,8 @@ public class WireNetworkBackupBlockEntity extends BlockEntity {
         // If level is clientside, then we still want to save because schematics save on client thread, which is such a mess
         if (level == null) return;
 
-        Ship s = VSGameUtilsKt.getShipManagingPos(level, this.getBlockPos());
-        if (s instanceof ServerShip ss) {
+        Ship s = VSGameUtilsKt.getShipObjectManagingPos(level, this.getBlockPos());
+        if (s instanceof LoadedServerShip ss) {
             if (pendingBackupData == null) pendingBackupData = new CompoundTag();
             ShipWireNetworkManager.get(ss).ifPresent(
                     m -> pendingBackupData.merge(m.serialiseToNbt(level, this.getBlockPos()))
@@ -52,7 +53,7 @@ public class WireNetworkBackupBlockEntity extends BlockEntity {
     public void load(CompoundTag p_155245_) {
         super.load(p_155245_);
         if (!p_155245_.contains("WireNetwork", Tag.TAG_COMPOUND)) return;
-        if (VSGameUtilsKt.getShipManagingPos(this.level, this.getBlockPos()) instanceof ServerShip ss) {
+        if (VSGameUtilsKt.getShipObjectManagingPos(this.level, this.getBlockPos()) instanceof LoadedServerShip ss) {
             ShipWireNetworkManager.loadIfNotExists(ss, this.level, p_155245_.getCompound("WireNetwork"),
                     this.getBlockPos(), Rotation.NONE);
         }

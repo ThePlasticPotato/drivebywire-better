@@ -3,9 +3,9 @@ package edn.stratodonut.drivebywire.mixin.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.simibubi.create.content.schematics.client.SchematicAndQuillHandler;
-import com.simibubi.create.foundation.utility.LangBuilder;
 import edn.stratodonut.drivebywire.WirePackets;
 import edn.stratodonut.drivebywire.network.WireNetworkRequestSyncPacket;
+import net.createmod.catnip.lang.LangBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -21,7 +21,7 @@ public abstract class MixinSnqHandler {
 
     @WrapOperation(
             method = "onMouseInput",
-            at = @At(value = "INVOKE", target = "Lcom/simibubi/create/foundation/utility/LangBuilder;sendStatus(Lnet/minecraft/world/entity/player/Player;)V",
+            at = @At(value = "INVOKE", target = "Lnet/createmod/catnip/lang/LangBuilder;sendStatus(Lnet/minecraft/world/entity/player/Player;)V",
                     ordinal = 2
             ),
             remap = false

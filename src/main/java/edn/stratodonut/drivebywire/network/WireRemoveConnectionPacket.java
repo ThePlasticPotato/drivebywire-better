@@ -9,6 +9,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.network.NetworkEvent;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -50,12 +51,12 @@ public class WireRemoveConnectionPacket extends SimplePacketBase {
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
             if (sender == null) return;
-            Ship s = VSGameUtilsKt.getAllShips(sender.level()).getById(shipId);
+            Ship s = VSGameUtilsKt.getShipObjectWorld(sender.level()).getLoadedShips().getById(shipId);
 //            Ship s1 = VSGameUtilsKt.getShipManagingPos(sender.level(), BlockPos.of(start));
 //            Ship s2 = VSGameUtilsKt.getShipManagingPos(sender.level(), BlockPos.of(end));
 //            if (!Objects.equals(s, s1)) return; // WTF???
 //            if (Objects.equals(s1, s2) && s1 instanceof ServerShip ss) {
-            if (s instanceof ServerShip ss) {
+            if (s instanceof LoadedServerShip ss) {
                 ShipWireNetworkManager.get(ss).ifPresent(m -> {
                     m.removeConnection(sender.level(), BlockPos.of(start), BlockPos.of(end), Direction.from3DDataValue(dir), channel);
                     sender.level().playSound(null, BlockPos.of(end), WireSounds.PLUG_OUT.get(),

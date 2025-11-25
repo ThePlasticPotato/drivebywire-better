@@ -1,9 +1,9 @@
 package edn.stratodonut.drivebywire;
 
-import com.simibubi.create.foundation.utility.Components;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import edn.stratodonut.drivebywire.blocks.TweakedControllerHubBlock;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -22,7 +22,7 @@ public class WireCreativeTabs {
 
     public static final RegistryObject<CreativeModeTab> BASE_CREATIVE_TAB = REGISTER.register("base",
             () -> CreativeModeTab.builder()
-                    .title(Components.translatable("itemGroup.drivebywire"))
+                    .title(Component.translatable("itemGroup.drivebywire"))
                     .icon(WireItems.WIRE.asItem()::getDefaultInstance)
                     .displayItems((displayParams, output) -> {
                         for (RegistryEntry<Block> entry : REGISTRATE.getAll(Registries.BLOCK)) {

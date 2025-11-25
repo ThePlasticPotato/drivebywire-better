@@ -7,6 +7,7 @@ import edn.stratodonut.drivebywire.wire.ShipWireNetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -103,7 +104,7 @@ public class WireNetworkNode {
         public void setInput(Level level, String channel, int signal) {
             ShipWireNetworkManager parentManager = parent.get();
             if (parentManager == null) {
-                if (VSGameUtilsKt.getAllShips(level).getById(this.parentShipId) instanceof ServerShip ss &&
+                if (VSGameUtilsKt.getShipObjectWorld(level).getLoadedShips().getById(this.parentShipId) instanceof LoadedServerShip ss &&
                         ShipWireNetworkManager.get(ss).isPresent()) {
                     parentManager = ShipWireNetworkManager.get(ss).get();
                     parent = new WeakReference<>(parentManager);

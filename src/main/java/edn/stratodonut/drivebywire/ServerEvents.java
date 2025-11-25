@@ -14,6 +14,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -41,8 +42,8 @@ public class ServerEvents {
     @SubscribeEvent
     public static void onBlockUpdate(BlockEvent.NeighborNotifyEvent event) {
         if (event.getLevel() instanceof ServerLevel level) {
-            Ship s = VSGameUtilsKt.getShipManagingPos(level, event.getPos());
-            if (s instanceof ServerShip ss) {
+            Ship s = VSGameUtilsKt.getShipObjectManagingPos(level, event.getPos());
+            if (s instanceof LoadedServerShip ss) {
                 BlockState state = level.getBlockState(event.getPos());
                 if (state.isSignalSource()) {
                     int maxSignal = EnumSet.allOf(Direction.class).stream()
